@@ -1,4 +1,4 @@
-### Desafio de Xadrez - progresso
+### Desafio Batalha Naval - progresso
 
 - [x] Nível Novato
 - [x] Nível Aventureiro
