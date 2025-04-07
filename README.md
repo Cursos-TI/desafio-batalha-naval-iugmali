@@ -2,7 +2,7 @@
 
 - [x] Nível Novato
 - [x] Nível Aventureiro
-- [ ] Nível Mestre
+- [x] Nível Mestre
 
 ### Como rodar o projeto
 

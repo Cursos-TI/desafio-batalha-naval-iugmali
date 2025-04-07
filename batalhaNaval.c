@@ -6,6 +6,8 @@
 #define TAMANHO_NAVIO 3       // Tamanho de cada navio
 #define AGUA 0                // Valor representando água
 #define NAVIO 3               // Valor representando partes do navio
+#define HABILIDADE 5   // Valor representando área afetada por habilidade
+#define TAM_HABILIDADE 5 // Tamanho da matriz de habilidade (5x5)
 
 // Estrutura para armazenar a posição decodificada
 typedef struct {
@@ -18,6 +20,12 @@ void inicializarTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 Posicao decodificarPosicao(char *posicaoNavio);
 bool posicaoValida(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha, int coluna, bool ehHorizontal, bool ehDiagonal, bool ehDiagonalDecrescente);
 void posicionarNavio(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha, int coluna, bool ehHorizontal, bool ehDiagonal, bool ehDiagonalDecrescente);
+void criarMatrizCone(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]);
+void criarMatrizCruz(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]);
+void criarMatrizOctaedro(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]);
+void aplicarHabilidade(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
+                       int matriz[TAM_HABILIDADE][TAM_HABILIDADE],
+                       int linha, int coluna);
 void exibirTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]);
 
 int main() {
@@ -26,8 +34,8 @@ int main() {
     inicializarTabuleiro(tabuleiro);
 
     char *posicaoNavio1 = "C1"; // Horizontal
-    char *posicaoNavio2 = "F8"; // Vertical
-    char *posicaoNavio3 = "H5"; // Diagonal crescente
+    char *posicaoNavio2 = "I8"; // Vertical
+    char *posicaoNavio3 = "H1"; // Diagonal crescente
     char *posicaoNavio4 = "C6"; // Diagonal decrescente
     // Define as posições dos navios
     Posicao navios[4] = {
@@ -73,7 +81,36 @@ int main() {
     // Exibe o tabuleiro
     printf("\nTabuleiro de Batalha:\n");
     exibirTabuleiro(tabuleiro);
+    // Após exibir o tabuleiro com navios
+    printf("\nAplicando habilidades especiais:\n");
 
+    // Cria e aplica a habilidade Cone
+    int matrizCone[TAM_HABILIDADE][TAM_HABILIDADE];
+    criarMatrizCone(matrizCone);
+    Posicao pCone = decodificarPosicao("C4"); // Coordenada para o cone
+    int tabuleiroTemp[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+    aplicarHabilidade(tabuleiro, matrizCone, pCone.linha, pCone.coluna);
+    printf("\nHabilidade Cone aplicada na posição %c%d:\n", pCone.coluna + 'A', pCone.linha + 1);
+
+
+    // Cria e aplica a habilidade Cruz
+    int matrizCruz[TAM_HABILIDADE][TAM_HABILIDADE];
+    criarMatrizCruz(matrizCruz);
+    Posicao pCruz = decodificarPosicao("D8"); // Coordenada para a cruz
+    aplicarHabilidade(tabuleiro, matrizCruz, pCruz.linha, pCruz.coluna);
+    printf("Habilidade Cruz aplicada na posição %c%d:\n", pCruz.coluna + 'A', pCruz.linha + 1);
+
+
+    // Cria e aplica a habilidade Octaedro
+    int matrizOctaedro[TAM_HABILIDADE][TAM_HABILIDADE];
+    criarMatrizOctaedro(matrizOctaedro);
+    Posicao pOctaedro = decodificarPosicao("H6"); // Coordenada para o octaedro
+    aplicarHabilidade(tabuleiro, matrizOctaedro, pOctaedro.linha, pOctaedro.coluna);
+    printf("Habilidade Octaedro aplicada na posição %c%d:\n", pOctaedro.coluna + 'A', pOctaedro.linha + 1);
+
+    // Exibe o tabuleiro com habilidades
+    printf("\nTabuleiro com Habilidades:\n");
+    exibirTabuleiro(tabuleiro);
     return 0;
 }
 
@@ -175,7 +212,101 @@ void posicionarNavio(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int li
         }
     }
 }
+// Implementação das funções para habilidades especiais
+void criarMatrizCone(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]) {
+    // Inicializa a matriz com zeros
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        for (int j = 0; j < TAM_HABILIDADE; j++) {
+            matriz[i][j] = 0;
+        }
+    }
 
+    // Define a área de efeito do cone
+    // O cone se expande de cima para baixo
+    int centro = TAM_HABILIDADE / 2;
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        int largura = i;  // A largura aumenta conforme descemos
+        for (int j = centro - largura; j <= centro + largura; j++) {
+            if (j >= 0 && j < TAM_HABILIDADE && largura <= centro) {
+                matriz[i][j] = 1;
+            }
+        }
+    }
+}
+
+void criarMatrizCruz(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]) {
+    // Inicializa a matriz com zeros
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        for (int j = 0; j < TAM_HABILIDADE; j++) {
+            matriz[i][j] = 0;
+        }
+    }
+
+    // Define a área de efeito da cruz
+    int centro = TAM_HABILIDADE / 2;
+
+    // Linha horizontal da cruz
+    for (int j = 0; j < TAM_HABILIDADE; j++) {
+        matriz[centro][j] = 1;
+    }
+
+    // Linha vertical da cruz
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        matriz[i][centro] = 1;
+    }
+}
+
+void criarMatrizOctaedro(int matriz[TAM_HABILIDADE][TAM_HABILIDADE]) {
+    // Inicializa a matriz com zeros
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        for (int j = 0; j < TAM_HABILIDADE; j++) {
+            matriz[i][j] = 0;
+        }
+    }
+
+    // Define a área de efeito do octaedro (losango)
+    int centro = TAM_HABILIDADE / 2;
+    int raio = centro;
+
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        int distY = abs(i - centro);
+        int largura = raio - distY;
+
+        for (int j = centro - largura; j <= centro + largura; j++) {
+            if (j >= 0 && j < TAM_HABILIDADE) {
+                matriz[i][j] = 1;
+            }
+        }
+    }
+}
+
+void aplicarHabilidade(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],
+                       int matriz[TAM_HABILIDADE][TAM_HABILIDADE],
+                       int linha, int coluna) {
+    // Calcula o deslocamento para centralizar a matriz de habilidade
+    int deslocX = linha - (TAM_HABILIDADE / 2);
+    int deslocY = coluna - (TAM_HABILIDADE / 2);
+
+    // Aplica a matriz de habilidade ao tabuleiro
+    for (int i = 0; i < TAM_HABILIDADE; i++) {
+        for (int j = 0; j < TAM_HABILIDADE; j++) {
+            int tabX = i + deslocX;
+            int tabY = j + deslocY;
+
+            // Verifica se a posição está dentro dos limites do tabuleiro
+            if (tabX >= 0 && tabX < TAMANHO_TABULEIRO &&
+                tabY >= 0 && tabY < TAMANHO_TABULEIRO) {
+                // Marca a posição se ela está na área de efeito
+                if (matriz[i][j] == 1) {
+                    // Preserva navios na visualização
+                    if (tabuleiro[tabX][tabY] != NAVIO) {
+                        tabuleiro[tabX][tabY] = HABILIDADE;
+                    }
+                }
+            }
+        }
+    }
+}
 // Exibe o tabuleiro
 void exibirTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]) {
     // Exibe os índices das colunas
