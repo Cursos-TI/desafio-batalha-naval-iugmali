@@ -1,7 +1,7 @@
 ### Desafio de Xadrez - progresso
 
 - [x] Nível Novato
-- [ ] Nível Aventureiro
+- [x] Nível Aventureiro
 - [ ] Nível Mestre
 
 ### Como rodar o projeto
